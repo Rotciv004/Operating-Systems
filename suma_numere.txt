@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <time.h>
+
+int main(int argc, char* argv[])
+{
+        int pc[2] , cp[2];
+
+        if(pipe(pc) == -1 || pipe(cp) == -1)
+        {
+                perror("pipe");
+                exit(1);
+        }
+
+        int frk = fork();
+
+        if(frk == -1)
+        {
+                perror("frk");
+                exit(1);
+        }
+
+        if(frk == 0)
+        {
+                close(pc[1]);
+                close(cp[0]);
+
+                srand(time(NULL));
+                int nr = 0, sum = 0;
+
+                nr = atoi(argv[1]);
+
+
+                write(cp[1],&nr,sizeof(int));
+
+                read(pc[0],&sum,sizeof(int));
+
+                printf("SUMA = %d\n", sum);
+
+                close(pc[0]);
+                close(cp[1]);
+		
+                exit(0);
+        }
+
+        if(frk >= 1)
+        {
+                close(pc[0]);
+                close(cp[1]);
+
+                srand(time(NULL));
+
+                int nr = 0, sum = 0;
+
+                read(cp[0], &nr, sizeof(int));
+
+                for(int i = 0 ; i < nr ; ++i)
+                        sum = sum + rand();
+
+                write(pc[1], &sum, sizeof(int));
+
+                close(pc[1]);
+                close(cp[0]);
+
+                wait(NULL);
+                exit(0);
+        }
+
+        return 0;
+}

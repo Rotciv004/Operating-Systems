@@ -1,2 +1,2 @@
 # Operating-Systems
-Here I have some programing problems with threads and mutex solved in C
+C programs demonstrating concepts like threads, mutexes, semaphores, inter-process communication (IPC), file handling, and process management.
